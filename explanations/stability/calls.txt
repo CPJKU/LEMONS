@@ -1,0 +1,49 @@
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user johnny --num_samples 512 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user johnny --num_samples 1024 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user johnny --num_samples 2048 --batch_size 12
+
+# matteo & nina
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user matteo --num_samples 512 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user nina --num_samples 512 --batch_size 12
+
+
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user matteo --num_samples 1024 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user nina --num_samples 1024 --batch_size 12
+
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user matteo --num_samples 2048 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user nina --num_samples 2048 --batch_size 12
+
+
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user matteo --num_samples 4096 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user nina --num_samples 4096 --batch_size 12
+
+# matteo, paige, marko, sandra, johnny, elizabeth, nina
+
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user paige --num_samples 512 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user marko --num_samples 512 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user sandra --num_samples 512 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user johnny --num_samples 512 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user elizabeth --num_samples 512 --batch_size 12
+
+
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user paige --num_samples 1024 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user marko --num_samples 1024 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user sandra --num_samples 1024 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user johnny --num_samples 1024 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user elizabeth --num_samples 1024 --batch_size 12
+
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user paige --num_samples 2048 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user marko --num_samples 2048 --batch_size 12
+python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user sandra --num_samples 2048 --batch_size 12
+CUDA_VISIBLE_DEVICES=3 python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user johnny --num_samples 2048 --batch_size 12
+CUDA_VISIBLE_DEVICES=3 python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user elizabeth --num_samples 2048 --batch_size 12
+
+
+CUDA_VISIBLE_DEVICES=3 python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user paige --num_samples 4096 --batch_size 12
+CUDA_VISIBLE_DEVICES=3 python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user marko --num_samples 4096 --batch_size 12
+CUDA_VISIBLE_DEVICES=3 python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user sandra --num_samples 4096 --batch_size 12
+CUDA_VISIBLE_DEVICES=3 python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user johnny --num_samples 4096 --batch_size 12
+CUDA_VISIBLE_DEVICES=3 python -m explanations.stability.evaluate_stability --n_temporal_segments 5 --model_for_user elizabeth --num_samples 4096 --batch_size 12
+
+
+
