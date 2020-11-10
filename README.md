@@ -1,16 +1,20 @@
 # LEMONS: Listenable Explanations for Music recOmmeNder Systems
 **LEMONS** addresses the issue of explaining of why a track has been recommended to a user by providing listenable explanations based on the track itself.
 
-You can check out the [video of our demo](https://www.youtube.com/watch?v=giSPrPnZ7mc).
+## Overview
 
-We consider the following users/personas, distinguised by music preference:
-- **Marko**: Favourite genre is reggae. He also prefers more niche tracks and loud music.
-- **Matteo**: Favourite genres are trance, blues, and progressive.
-- **Johnny**: Listens to a bit of everything.
-- **Elizabeth**: Her top 3 genres she likes are rock, alternative metal, and heavy metal.
-- **Nina**: Favourite genres are rock, emo, and post-hardcore.
-- **Paige**: Mostly listens to popular music.
-- **Sandra**: Favourite genres are hip-hop and rap, especially dirty south rap.
+**LEMONS** consists of the following 2 parts: 
+
+1. Music Recommender System. The RS is content-based and we trained one model for each of 7 users. 
+2. Listenable Explanations. Explanations are computed post-hoc using [audioLIME](https://github.com/CPJKU/audioLIME), an extension of [LIME](https://arxiv.org/abs/1602.04938) for audio data.
+
+The functionality is demonstrated using a [streamlit](https://www.streamlit.io/) app. A screenshot of the **LEMONS** app can be seen below.
+
+![](imgs/landing_page.png)
+
+You can check out the [video of our demo](https://www.youtube.com/watch?v=giSPrPnZ7mc) (~9 minutes).
+
+In the following you can find the details to setup and conduct the same experiments and how to run the `streamlit` app to play around with the explanations.
 
 ## Setup
 
@@ -150,5 +154,10 @@ We train a total of 7 models, one for each user.
 ### Validation and Testing
 For evaluation, we use as input the whole track.
 
-## audioLIME
-We select the number of samples N_s to get stable explanations by following the procedure described in~\cite{Mishra2020Reliable}. Preliminary experiments on a subset of test examples (50 per user) showed that N_s=2^{11} suffices.
+## Experiments & Results
+
+We split the tracks into train, validation,and test set in an 80-10-10 fashion and select the model that achieves the bestresults in terms of AUC and MAP on the validation set. The results on the testset averaged across the users are 0.734±0.130 MAP and 0.758±0.113 AUC.
+
+### Stability of explanations
+We select the number of samples N_s to get stable explanations by following the procedure described in [[Mishra2020]](https://arxiv.org/abs/2005.07788). Preliminary experiments on a subset of test examples (50 per user) showed that N_s=2^{11} suffices.
+
