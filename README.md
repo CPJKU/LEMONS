@@ -159,5 +159,8 @@ streamlit run explanations/lemons.py
 We split the tracks into train, validation,and test set in an 80-10-10 fashion and select the model that achieves the bestresults in terms of AUC and MAP on the validation set. The results on the testset averaged across the users are 0.734±0.130 MAP and 0.758±0.113 AUC.
 
 ### Stability of explanations
-We select the number of samples N_s to get stable explanations by following the procedure described in [[Mishra2020]](https://arxiv.org/abs/2005.07788). Preliminary experiments on a subset of test examples (50 per user) showed that N_s=2^{11} suffices.
+We select the number of samples in the neighborhood N_s to get stable explanations by following the procedure described in [[Mishra 2020] Reliable Local Explanations for Machine Listening](https://arxiv.org/abs/2005.07788). In this experiment, the computation of the explanations is repeated 5 times, and each time the top k=3 interpretable components are recorded. With increasing number of samples N_s the number of unique components U_n should approach k (in our case: 3). We found that a number of N_s=2^11=2048 suffices to compute stable explanations in a reasonable amount of time.
 
+![](imgs/stability.png)
+
+Each violin represents the results for one user model for a subset of the test set (50 examples). Each data point in a violin shows how many unique components U_n (shown on the x-axis) were selected when repeating computation of the explanation for a test sample 5 times. The y-axis shows the number of neighborhood examples N_s that was used for training the explainer in each case. The figure shows that increasing N_s decreases U_n, on average. This means that for example for Sandra (purple), using `N_s=2048` and repeatedly computing an explanation consisting of 3 components for the same track will result in the same 3 components being picked (for a majority of the test songs).
