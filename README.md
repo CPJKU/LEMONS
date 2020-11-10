@@ -5,7 +5,7 @@
 
 **LEMONS** consists of the following 2 parts: 
 
-1. Music Recommender System. The RS is audio-based and we trained one model for each of 7 users. 
+1. Music Recommender System. The RS takes in input the audio tracks and outputs the relevance for the user. 
 2. Listenable Explanations. Explanations are computed post-hoc using [audioLIME](https://github.com/CPJKU/audioLIME), an extension of [LIME](https://arxiv.org/abs/1602.04938) for audio data.
 
 The functionality is demonstrated using a [streamlit](https://www.streamlit.io/) app. A screenshot of the **LEMONS** app can be seen below.
@@ -22,10 +22,21 @@ For training on the Million Song Dataset, we use snippets from 7digital. Snippet
 Audios are downsampled to 16kHz and transformed in decibel mel-spectograms. We use 256 mel bins with a hop size of 512. Only for training, we train on 1s randomly selected part of the snippet, leading to the input shape of 256x63.
 
 ### Model
-At the beginning of our model, we carry out batch normalization.
-Afterwards, the inputs go through 5 layers of convolutions. Each convolution is followed by another batch normalization, ReLU, and Max Pooling.
-The number of channels for the convolutions are: 1 -> 64 -> 128 -> 128 -> 64. Each maxpooling halves the width and height.
-In the last layers, we perform global average pooling and global max pooling. The two output are then combined, passed throught dropout and a fully connected layer which outputs the logit relevance for the track.
+The structure of the audio-based recommender system is depicted below.
+| Layers                                        |
+|-----------------------------------------------|
+| BatchNorm2d                                   |
+| Conv2d(1,64), BatchNorm2d, ReLU, MaxPool2d    |
+| Conv2d(64,128), BatchNorm2d, ReLU, MaxPool2d  |
+| Conv2d(128,128), BatchNorm2d, ReLU, MaxPool2d |
+| Conv2d(128,128), BatchNorm2d, ReLU, MaxPool2d |
+| Conv2d(128,64), BatchNorm2d, ReLU, MaxPool2d  |
+| Cat(AdaptiveAvgPool2d + AdaptiveMaxPool2d)    |
+| Dropout(0.5)                                  |
+| Linear(128,1)                                 |
+
+Convolutions have a kernel of 3x3 while MaxPooling halves in both dimensions each time.
+In the last layers we concatenate global average pooling and global max pooling, apply dropout, and feed it to a linear layer.
 
 ### Training
 We use a batch size of 20 and train for 1000 epochs with a learning rate of 1e-3, weight decay of 1e-4, and Adam optimizer.
@@ -72,41 +83,35 @@ local_conf = {
 }
 ```
 
-In `experiment_config()` in `recsys/experiment.py`, you can change the following parameters (commented):
+In `experiment_config()` in `recsys/experiment.py`, you can change the following parameters:
 ```python
-def experiment_config():
-    # --Logging Parameters-- #
+# --Logging Parameters-- #
 
-    uid = generate_uid()                        
-    model_save_path = '../experiments/{}/'.format(uid)
-    use_tensorboard = 0  # if also tensorboard (together with sacred) should be used
-    log_step = 100 # how many batches have to pass before logging the batch loss (NB. this is not for avg_loss)
+use_tensorboard = 0  # if also tensorboard (together with sacred) should be used
+log_step = 100 # how many batches have to pass before logging the batch loss (NB. this is not for avg_loss)
 
-    # --Training Parameters-- #
+# --Training Parameters-- #
 
-    training_seed = 1930289 # seed used for training (independent of the data seed)
-    model_type = 'base' # which model to train (check model.py to see the ones available)
-    input_length = get_model_input_length(model_type) 
-    model_load_path = '' # if load pre-trained model
-    freeze = 1  # if freeze the weights of a pre-trained model
-    batch_size = 20 # batch size
-    n_epochs = 1000 # epochs for training
-    lr = 1e-3 # learning rate
-    wd = 1e-4 # weight decay
-    num_workers = 10 # number of workers
-    device = 'cuda:0' # which device to use
+training_seed = 1930289 # seed used for training (independent of the data seed)
+model_load_path = '' # if load pre-trained model
+freeze = 1  # if freeze the weights of a pre-trained model
+batch_size = 20 # batch size
+n_epochs = 1000 # epochs for training
+lr = 1e-3 # learning rate
+wd = 1e-4 # weight decay
+num_workers = 10 # number of workers
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'  # which device to use
 
-    # --Data Parameters-- #
+# --Data Parameters-- #
 
-    data_path = '' # path to the npys
-    meta_path = '../data/' # path to the meta data
-    user_name = 'marko' # users (check utils, get_user_id)
-    user_id = get_user_id(user_name)
+data_path = '' # path to the npys
+meta_path = '../data/' # path to the meta data
+user_name = 'marko' # users (check utils, get_user_id)
 ```
 Then training can be run with:
 ```shell script
 cd recsys
-python3 experiment.py with seed=1057386
+python3 experiment.py
 ```
 The best model will be saved by default in the directory /experiments/<date>.
 
@@ -116,32 +121,27 @@ In local_conf in experiment.py, change the following:
 - mongodb_db_name  (similar to above):
 In experiment_config() in eval.py, you can change the following parameters (commented):
 ```python
-def experiment_config():
-    # --Logging Parameters-- #
+# --Logging Parameters-- #
 
-    use_tensorboard = 1  # if also tensorboard (together with sacred) should be used
+use_tensorboard = 1  # if also tensorboard (together with sacred) should be used
 
-    # --Evaluation Parameters-- #
+# --Evaluation Parameters-- #
 
-    model_type = 'base'  # which model to train (check model.py to see the ones available)
-    input_length = get_model_input_length(model_type)
-    model_load_path = 'best_model.pth'  # path to the trained model
-    results_path = os.path.dirname(model_load_path) + "/results.pkl"  # TODO: not used for now
-    batch_size = 20  # batch size
-    num_workers = 10  # number of workers
-    device = 'cuda:0'  # which device to use
+model_load_path = 'best_model.pth'  # path to the trained model
+batch_size = 20  # batch size
+num_workers = 10  # number of workers
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'   # which device to use
 
-    # --Data Parameters-- #
+# --Data Parameters-- #
 
-    data_path = ''  # path to the npys
-    meta_path = '../data/'  # path to the meta data
-    user_name = 'marko'  # users (check utils, get_user_id)
-    user_id = get_user_id(user_name)
+data_path = ''  # path to the npys
+meta_path = '../data/'  # path to the meta data
+user_name = 'marko'  # users (check utils, get_user_id)
 ```
 Then the evaluation can be run with:
 ```shell script
 cd training/
-python3 eval.py with seed=1057386
+python3 eval.py
 ```
 The results will be saved in the same directory of "model_load_path".
 
