@@ -5,7 +5,7 @@
 
 **LEMONS** consists of the following 2 parts: 
 
-1. Music Recommender System. The RS is content-based and we trained one model for each of 7 users. 
+1. Music Recommender System. The RS is audio-based and we trained one model for each of 7 users. 
 2. Listenable Explanations. Explanations are computed post-hoc using [audioLIME](https://github.com/CPJKU/audioLIME), an extension of [LIME](https://arxiv.org/abs/1602.04938) for audio data.
 
 The functionality is demonstrated using a [streamlit](https://www.streamlit.io/) app. A screenshot of the **LEMONS** app can be seen below.
@@ -14,7 +14,25 @@ The functionality is demonstrated using a [streamlit](https://www.streamlit.io/)
 
 You can check out the [video of our demo](https://www.youtube.com/watch?v=giSPrPnZ7mc) (~9 minutes).
 
-In the following you can find the details to setup and conduct the same experiments and how to run the `streamlit` app to play around with the explanations.
+In the following you can find the details about the recommender system, how to setup and conduct the same experiments and how to run the `streamlit` app to play around with the explanations.
+
+## Audio-based Recommender System - Model and Training details
+### Input
+For training on the Million Song Dataset, we use snippets from 7digital. Snippet durations range from 30s to 60s.
+Audios are downsampled to 16kHz and transformed in decibel mel-spectograms. We use 256 mel bins with a hop size of 512. Only for training, we train on 1s randomly selected part of the snippet, leading to the input shape of 256x63.
+
+### Model
+At the beginning of our model, we carry out batch normalization.
+Afterwards, the inputs go through 5 layers of convolutions. Each convolution is followed by another batch normalization, ReLU, and Max Pooling.
+The number of channels for the convolutions are: 1 -> 64 -> 128 -> 128 -> 64. Each maxpooling halves the width and height.
+In the last layers, we perform global average pooling and global max pooling. The two output are then combined, passed throught dropout and a fully connected layer which outputs the logit relevance for the track.
+
+### Training
+We use a batch size of 20 and train for 1000 epochs with a learning rate of 1e-3, weight decay of 1e-4, and Adam optimizer.
+We train a total of 7 models, one for each user. 
+
+### Validation and Testing
+For evaluation, we use as input the whole track.
 
 ## Setup
 
@@ -135,24 +153,6 @@ It has to be run from the `lemons` root directory.
 ```
 streamlit run explanations/lemons.py
 ```
-
-## Audio-based Recommender System - Model and Training details
-### Input
-For training on the Million Song Dataset, we use snippets from 7digital. Snippet durations range from 30s to 60s.
-Audios are downsampled to 16kHz and transformed in decibel mel-spectograms. We use 256 mel bins with a hop size of 512. Only for training, we train on 1s randomly selected part of the snippet, leading to the input shape of 256x63.
-
-### Model
-At the beginning of our model, we carry out batch normalization.
-Afterwards, the inputs go through 5 layers of convolutions. Each convolution is followed by another batch normalization, ReLU, and Max Pooling.
-The number of channels for the convolutions are: 1 -> 64 -> 128 -> 128 -> 64. Each maxpooling halves the width and height.
-In the last layers, we perform global average pooling and global max pooling. The two output are then combined, passed throught dropout and a fully connected layer which outputs the logit relevance for the track.
-
-### Training
-We use a batch size of 20 and train for 1000 epochs with a learning rate of 1e-3, weight decay of 1e-4, and Adam optimizer.
-We train a total of 7 models, one for each user. 
-
-### Validation and Testing
-For evaluation, we use as input the whole track.
 
 ## Experiments & Results
 
