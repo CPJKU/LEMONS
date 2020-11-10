@@ -1,6 +1,8 @@
 # LEMONS: Listenable Explanations for Music recOmmeNder Systems
 **LEMONS** addresses the issue of explaining of why a track has been recommended to a user by providing listenable explanations based on the track itself.
 
+You can check out the [video of our demo](https://www.youtube.com/watch?v=giSPrPnZ7mc).
+
 We consider the following users/personas, distinguised by music preference:
 - **Marko**: Favourite genre is reggae. He also prefers more niche tracks and loud music.
 - **Matteo**: Favourite genres are trance, blues, and progressive.
@@ -10,19 +12,16 @@ We consider the following users/personas, distinguised by music preference:
 - **Paige**: Mostly listens to popular music.
 - **Sandra**: Favourite genres are hip-hop and rap, especially dirty south rap.
 
-## Install the conda environment 
+## Setup
+
+### Create an environment with all dependencies
 
 ```shell script
-conda env create -f ajures.yml
-conda activate ajures
-```
-Furthermore, audioLIME needs to be installed manually (while ajures is active):
-```shell script
-cd explanations
-pip install -e git://github.com/CPJKU/audioLIME.git#egg=audioLIME
+conda env create -f lemons.yml
+conda activate lemons
 ```
 
-### Setup
+### Install `lemons`
 In the root directory, run the following:
 ```shell script
 python3 setup.py develop
@@ -32,10 +31,16 @@ or, if it doesn't work
 pip install -e .
 ```
 
+### Config
+
+Some paths need to be set, e.g. to the location of your data.
+Copy `config_template.py` to `config.py` and set your paths there. `config.py` is in `.gitignore` 
+such that each user has their own config without overwriting the others.
+
 ## Training
 Before training, it could be necessary to tune the following parameters.
 
-In local_conf in experiment.py, change the following:
+We use [`sacred`](https://github.com/IDSIA/sacred) to log all experiments. In `local_conf` in `recsys/experiment.py`, change the following:
 - mongodb_db_name 
 ```python
 local_conf = {
@@ -45,7 +50,7 @@ local_conf = {
 }
 ```
 
-In experiment_config() in experiment.py, you can change the following parameters (commented):
+In `experiment_config()` in `recsys/experiment.py`, you can change the following parameters (commented):
 ```python
 def experiment_config():
     # --Logging Parameters-- #
@@ -78,7 +83,7 @@ def experiment_config():
 ```
 Then training can be run with:
 ```shell script
-cd training
+cd recsys
 python3 experiment.py with seed=1057386
 ```
 The best model will be saved by default in the directory /experiments/<date>.
@@ -118,20 +123,13 @@ python3 eval.py with seed=1057386
 ```
 The results will be saved in the same directory of "model_load_path".
 
-### Config
-
-Some paths need to be set, e.g. to the location where you want to store the spleeter model which
-is used for separating the sources (it will be downloaded when used the first time).
-Copy `config_template.py` to `config.py` and set your paths there. `config.py` is in `.gitignore` 
-such that each user has their own config without overwriting the others.
-
-### Demo 
+## Demo 
 
 You can look at a demonstration using the `streamlit` app. 
-It has to be run from the `ajures` directory.
+It has to be run from the `lemons` root directory.
 
 ```
-streamlit run explanations/explain_recmodel.py
+streamlit run explanations/lemons.py
 ```
 
 ## Audio-based Recommender System - Model and Training details
@@ -146,7 +144,7 @@ The number of channels for the convolutions are: 1 -> 64 -> 128 -> 128 -> 64. Ea
 In the last layers, we perform global average pooling and global max pooling. The two output are then combined, passed throught dropout and a fully connected layer which outputs the logit relevance for the track.
 
 ### Training
-We use a batch size of 20 and train for 1000 epochs with a learning rate of 1e-3, weight decay of 1e-4, adn Adam optimizer.
+We use a batch size of 20 and train for 1000 epochs with a learning rate of 1e-3, weight decay of 1e-4, and Adam optimizer.
 We train a total of 7 models, one for each user. 
 
 ### Validation and Testing
