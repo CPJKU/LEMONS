@@ -31,12 +31,18 @@ for training, we train on 1s randomly selected part of the snippet, leading to i
 
 ### Model
 
-The structure of the audio-based recommender system is depicted below. | Layers |
-|-----------------------------------------------| | BatchNorm2d | | Conv2d(1,64), BatchNorm2d, ReLU, MaxPool2d | |
-Conv2d(64,128), BatchNorm2d, ReLU, MaxPool2d | | Conv2d(128,128), BatchNorm2d, ReLU, MaxPool2d | | Conv2d(128,128),
-BatchNorm2d, ReLU, MaxPool2d | | Conv2d(128,64), BatchNorm2d, ReLU, MaxPool2d | | Cat(AdaptiveAvgPool2d +
-AdaptiveMaxPool2d)    | | Dropout(0.5)                                  | | Linear(128,1)
-|
+The structure of the audio-based recommender system is depicted below. 
+| Layers                                        |
+|-----------------------------------------------|
+| BatchNorm2d                                   |
+| Conv2d(1,64), BatchNorm2d, ReLU, MaxPool2d    |
+| Conv2d(64,128), BatchNorm2d, ReLU, MaxPool2d  |
+| Conv2d(128,128), BatchNorm2d, ReLU, MaxPool2d |
+| Conv2d(128,128), BatchNorm2d, ReLU, MaxPool2d |
+| Conv2d(128,64), BatchNorm2d, ReLU, MaxPool2d  |
+| Cat(AdaptiveAvgPool2d + AdaptiveMaxPool2d)    |
+| Dropout(0.5)                                  |
+| Linear(128,1)                                 |
 
 Convolutions have a kernel of 3x3 while MaxPooling halves in both dimensions each time. In the last layers we
 concatenate global average pooling and global max pooling, apply dropout, and feed it to a linear layer.
