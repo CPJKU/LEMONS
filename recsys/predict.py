@@ -1,5 +1,6 @@
 # coding: utf-8
 import datetime
+import os
 
 import torch
 import torch.nn as nn
@@ -17,9 +18,9 @@ class Predict(object):
         self.use_tensorboard = config.use_tensorboard
 
         # --Evaluation Parameters-- #
-        self.model_type = config.model_type
         self.model_load_path = config.model_load_path
-        self.results_path = config.results_path
+        self.results_path = config.results_path if 'results_path' in config else \
+            os.path.dirname(self.model_load_path) + "/MSD_{}.pkl".format(config.user_name)
         self.device = torch.device(config.device)
 
         # --Data Parameters-- #
@@ -32,7 +33,7 @@ class Predict(object):
     def build_model(self):
 
         self.model = FCN(n_class=1)
-        self.model.cuda(device=self.device)
+        self.model = self.model.to(self.device)
 
         # load model
         self.load(self.model_load_path)
@@ -59,4 +60,5 @@ class Predict(object):
         print("[%s] Finished Testing! test_loss is %f" % (
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), test_loss))
 
+        # Save results
         pickle_dump(preds, self.results_path)

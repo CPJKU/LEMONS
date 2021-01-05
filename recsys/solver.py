@@ -19,7 +19,6 @@ class Solver(object):
         self.model_save_path = config.model_save_path
 
         # --Training Parameters-- #
-        self.model_type = config.model_type
         self.model_load_path = config.model_load_path
         self.n_epochs = config.n_epochs
         self.lr = config.lr
@@ -38,7 +37,7 @@ class Solver(object):
     def build_model(self):
 
         self.model = FCN(n_class=1)
-        self.model.cuda(device=self.device)
+        self.model = self.model.to(self.device)
 
         # Loading pre-trained model if specified
         if len(self.model_load_path) > 1:

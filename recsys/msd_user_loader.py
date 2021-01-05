@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pandas as pd
 from torch.utils import data
 
 from utilities.utils import pickle_load, get_user_id
@@ -48,7 +49,8 @@ class MSDDataset(data.Dataset):
             Dictionary containing the labels for the tracks.
         """
 
-        labels = pickle_load(os.path.join(self.splits_dir, 'labels.pkl'))
+        labels = pd.read_csv(os.path.join(self.splits_dir, 'labels.csv'), names=['track_id', 'playcount']) \
+            .set_index('track_id')
 
         if self.split_set == 'TRAIN':
             track_list = pickle_load(os.path.join(self.splits_dir, 'train.pkl'))
@@ -95,7 +97,7 @@ class MSDDataset(data.Dataset):
     def __getitem__(self, index):
         msdid = self.track_list[index]
 
-        label_binary = self.labels[msdid].astype('float32')
+        label_binary = np.array([1 if self.labels.loc[msdid]['playcount'] > 0 else 0], dtype='float32')
         npy = self.get_npy(msdid).astype('float32')
 
         return npy, label_binary

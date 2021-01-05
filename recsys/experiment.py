@@ -5,15 +5,15 @@ import torch
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-from conf.config import track_path, meta_path
+from conf.config import data_path, models_path, msd_npy_path
 from recsys.msd_user_loader import get_msd_audio_loader
 from recsys.solver import Solver
 from utilities.utils import generate_uid, get_user_id, reproducible
 
 # Local experiment configuration #
 local_conf = {
-    'mongodb_url': 'mdb.cp.jku.at:27017',  # TODO: To remove
-    'mongodb_db_name': 'ajures',  # TODO: To remove
+    'mongodb_url': '',
+    'mongodb_db_name': 'LEMONS',
     'experiment_name': 'LEMONS',
 }
 ex = Experiment(local_conf['experiment_name'])
@@ -26,7 +26,7 @@ def experiment_config():
     # --Logging Parameters-- #
 
     uid = generate_uid()
-    model_save_path = '../experiments/{}/'.format(uid)
+    model_save_path = os.path.join(models_path, uid)
     use_tensorboard = 0  # if also tensorboard (together with sacred) should be used
     log_step = 100  # how many batches have to pass before logging the batch loss (NB. this is not for avg_loss)
 
@@ -44,12 +44,8 @@ def experiment_config():
 
     # --Data Parameters-- #
 
-    data_path = track_path  # path to the npys
-    meta_path = meta_path  # path to the meta data
     user_name = 'marko'  # users (check utils, get_user_id)
     user_id = get_user_id(user_name)
-
-    macro_experiment_name = ''  # used only when running multiple experiments for the architecture
 
 
 @ex.automain
@@ -63,8 +59,8 @@ def main(_config):
 
     # Get data
     train_loader = get_msd_audio_loader(
-        conf.data_path,
-        conf.meta_path,
+        msd_npy_path,
+        os.path.join(data_path, 'split', '{}-1057386'.format(conf.user_name)),
         conf.user_name,
         batch_size=conf.batch_size,
         split_set='TRAIN',
@@ -73,8 +69,8 @@ def main(_config):
     )
 
     val_loader = get_msd_audio_loader(
-        conf.data_path,
-        conf.meta_path,
+        msd_npy_path,
+        os.path.join(data_path, 'split', '{}-1057386'.format(conf.user_name)),
         conf.user_name,
         batch_size=1,
         split_set='VAL',
