@@ -1,0 +1,5 @@
+src/
+.idea/
+__pycache__
+
+conf/config.py

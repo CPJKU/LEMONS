@@ -16,13 +16,13 @@ def compute_start_length(x, snippet_length, sample_rate):
 
 class Musdb18Dataset(data.Dataset):
     def __init__(self, musdb_root,
-                 # precomputed_path='/share/cp/projects/ajures/data/precomputed/musdb_audios.pt',
-                 precomputed_path='/home/verena/data/cached_data/musdb_audios.pt',
+                 precomputed_path='musdb_audios.pt',
                  input_length=30,
                  sample_rate=16000,
                  take_center=False,
                  load_audio=True,
                  snippet_length=None):
+
         self.input_length = input_length  # currently in seconds
         self.musdb = musdb.DB(root=musdb_root)
         self.sample_rate = sample_rate
@@ -33,7 +33,6 @@ class Musdb18Dataset(data.Dataset):
         if self.take_center:
             assert snippet_length is not None
             self.snippet_length = snippet_length
-        print("snippet_length", self.snippet_length)
 
         if self.load_audio:
             if os.path.exists(precomputed_path):
